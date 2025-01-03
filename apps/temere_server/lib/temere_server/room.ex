@@ -34,19 +34,15 @@ defmodule TemereServer.Room do
   def handle_call({:exit, player}, _from, state) do
     players = Enum.reject(state.players, &(&1 == player))
 
-    case Enum.find(players, &(&1 == player)) do
-      nil ->
-        case length(players) do
-          0 ->
-            GenServer.stop(_who_is_calling_)
-            {:reply, :ok, %{players: players, status: :waiting_for_player}}
-
-          _ ->
-            {:reply, :ok, %{players: players, status: :waiting_for_player}}
-        end
-
-      _ ->
+    cond do
+      Enum.find(players, &(&1 == player)) != nil ->
         {:reply, {:error, :player_not_found}, state}
+
+      length(players) == 0 ->
+        {:stop, :room_without_players, :ok, state}
+
+      true ->
+        {:reply, :ok, %{players: players, status: :waiting_for_player}}
     end
   end
 end
