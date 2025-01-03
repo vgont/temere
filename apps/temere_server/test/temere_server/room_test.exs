@@ -23,6 +23,21 @@ defmodule TemereServer.RoomTest do
   test "A player exits the room", %{room: room} do
     player = Player.create!("nocettinha")
     {:ok, _players} = Room.join(room, player)
+
     assert :ok = Room.exit(room, player)
+  end
+
+  test "Room must be deleted if it has no players", %{room: room} do
+    player = Player.create!("nocettinha")
+    {:ok, players} = Room.join(room, player)
+
+    [player_1, player_2] = players
+
+    assert :ok = Room.exit(room, player_1)
+    assert Room.exit(room, player_2)
+    # player = Player.create!("nocettinha")
+    # asdf = Room.join(room, player)
+
+    # IO.puts(inspect(asdf))
   end
 end
