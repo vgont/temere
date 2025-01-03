@@ -1,4 +1,4 @@
 # Temere
 
-**TODO: Add description**
+**A word guessing game between two players**
 
