@@ -17,7 +17,7 @@ defmodule TemereServer.RoomTest do
     assert Enum.at(players, 1).name == "vinicinho"
 
     player = Player.create!("invalid_player")
-    assert {:error, _} = Room.join(room, player)
+    assert {:error, :full_room} = Room.join(room, player)
   end
 
   test "A player exits the room", %{room: room} do
