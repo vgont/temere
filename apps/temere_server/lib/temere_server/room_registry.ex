@@ -27,7 +27,7 @@ defmodule RoomRegistry do
         :ets.insert(room_table, {room_name, room})
         {:reply, :ok, room_table}
 
-      true ->
+      _ ->
         {:reply, {:error, :already_exists}, room_table}
     end
   end
