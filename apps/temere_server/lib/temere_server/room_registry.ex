@@ -1,4 +1,4 @@
-defmodule RoomRegistry do
+defmodule TemereServer.RoomRegistry do
   alias TemereServer.Room
   use GenServer
 
