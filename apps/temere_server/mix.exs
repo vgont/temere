@@ -26,7 +26,9 @@ defmodule TemereServer.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:bandit, "~> 1.0"},
+      {:poison, "~> 6.0"},
     ]
   end
 end
