@@ -1,6 +1,6 @@
 defmodule TemereServer.Player do
   alias __MODULE__
-  @enforce_keys [:uuid]
+  @derive [Poison.Encoder]
   defstruct [:uuid, :name, :type]
 
   @type t() :: %Player{

@@ -1,18 +1,15 @@
 defmodule TemereServer do
-  @moduledoc """
-  Documentation for `TemereServer`.
-  """
+  use Plug.Router
 
-  @doc """
-  Hello world.
+  plug :match
 
-  ## Examples
+  plug Plug.Parsers,
+    parsers: [:json],
+    pass: ["application/json"],
+    json_decoder: Poison
 
-      iex> TemereServer.hello()
-      :world
+  plug :dispatch
 
-  """
-  def hello do
-    :world
-  end
+  forward "/player", to: TemereServer.PlayerRouter
+
 end
