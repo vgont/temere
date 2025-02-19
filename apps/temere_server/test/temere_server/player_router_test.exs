@@ -1,4 +1,4 @@
-defmodule PlayerRouterTest do
+defmodule TemereServer.PlayerRouterTest do
   use ExUnit.Case, async: true
   use Plug.Test
   alias TemereServer.Player
