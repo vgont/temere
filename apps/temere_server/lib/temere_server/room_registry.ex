@@ -45,6 +45,7 @@ defmodule TemereServer.RoomRegistry do
 
   def handle_call(:get_all_rooms, _from, room_table) do
     rooms = :ets.tab2list(room_table)
+    rooms = Enum.map(rooms, fn {room_name, _room} -> room_name end)
     {:reply, rooms, room_table}
   end
 
