@@ -19,4 +19,11 @@ defmodule TemereServer.RoomRegistryTest do
     RoomRegistry.create(RoomRegistry, player1, "first_room")
     assert {:ok, _room} = RoomRegistry.lookup(RoomRegistry, "first_room")
   end
+
+  test "Get all rooms.", %{player1: player1} do
+    RoomRegistry.create(RoomRegistry, player1, "first_room")
+    RoomRegistry.create(RoomRegistry, player1, "second_room")
+    assert rooms = RoomRegistry.get_all_rooms(RoomRegistry)
+    assert length(rooms) == 2
+  end
 end
