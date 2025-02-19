@@ -1,15 +1,15 @@
 defmodule TemereServer.RoomRegistryRouter do
-  alias TemereServer.RoomRegistry
   use Plug.Router
   import Plug.Conn
+  alias TemereServer.RoomRegistry
 
   plug(:match)
   plug(:dispatch)
 
-  post "/join/:room" do
-    player = conn.body_params.player
-    {:ok, players} = Room.join(room, player)
-
+  post "/new" do
+    player = conn.body_params["player"]
+    room_name = conn.body_params["room_name"]
+    :ok = RoomRegistry.create(TemereServer.RoomRegistry, player, room_name)
     conn = send_resp(conn, 200, "Joined")
     conn
   end
