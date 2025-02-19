@@ -13,4 +13,10 @@ defmodule TemereServer.RoomRegistryRouter do
     conn = send_resp(conn, 200, "Joined")
     conn
   end
+
+  get "/all" do
+    rooms = inspect RoomRegistry.get_all_rooms(TemereServer.RoomRegistry)
+    conn = send_resp(conn, 200, rooms)
+    conn
+  end
 end
