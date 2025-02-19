@@ -40,8 +40,6 @@ defmodule TemereServer.RoomRegistry do
   end
 
   def handle_info({:delete, room}, room_table) do
-    IO.puts("Room process has crashed or exited: #{inspect(room)}")
-    IO.inspect Process.alive?(room)
     :ets.match_delete(room_table, {:"$1", room})
     {:noreply, room_table}
   end
