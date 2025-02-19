@@ -12,4 +12,5 @@ defmodule TemereServer do
   plug(:dispatch)
 
   forward("/player", to: TemereServer.PlayerRouter)
+  forward("/room", to: TemereServer.RoomRegistryRouter)
 end
