@@ -1,15 +1,15 @@
 defmodule TemereServer do
   use Plug.Router
 
-  plug :match
+  plug(:match)
 
-  plug Plug.Parsers,
+  plug(Plug.Parsers,
     parsers: [:json],
     pass: ["application/json"],
     json_decoder: Poison
+  )
 
-  plug :dispatch
+  plug(:dispatch)
 
-  forward "/player", to: TemereServer.PlayerRouter
-
+  forward("/player", to: TemereServer.PlayerRouter)
 end
