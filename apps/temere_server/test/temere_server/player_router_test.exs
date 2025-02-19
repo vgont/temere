@@ -4,7 +4,7 @@ defmodule PlayerRouterTest do
   alias TemereServer.Player
 
   @opts TemereServer.init([])
- 
+
   test "POST /player/new" do
     conn = conn(:post, "/player/new", %{name: "vgont"})
 
