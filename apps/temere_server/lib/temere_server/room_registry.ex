@@ -2,9 +2,8 @@ defmodule TemereServer.RoomRegistry do
   alias TemereServer.Room
   use GenServer
 
-  ## Client API
   def start_link([]) do
-    GenServer.start_link(RoomRegistry, :rooms)
+    GenServer.start_link(__MODULE__, :rooms, name: __MODULE__)
   end
 
   def create(server, player, room_name) do
@@ -25,6 +24,7 @@ defmodule TemereServer.RoomRegistry do
       [] ->
         {:ok, room} = GenServer.start_link(Room, player)
         :ets.insert(room_table, {room_name, room})
+
         {:reply, :ok, room_table}
 
       _ ->
@@ -37,5 +37,12 @@ defmodule TemereServer.RoomRegistry do
       [{^room_name, room}] -> {:reply, {:ok, room}, room_table}
       [] -> {:reply, {:error, :not_found}, room_table}
     end
+  end
+
+  def handle_info({:delete, room}, room_table) do
+    IO.puts("Room process has crashed or exited: #{inspect(room)}")
+    IO.inspect Process.alive?(room)
+    :ets.match_delete(room_table, {:"$1", room})
+    {:noreply, room_table}
   end
 end
