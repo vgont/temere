@@ -28,7 +28,7 @@ defmodule TemereServer.MixProject do
     [
       {:uuid, "~> 1.1"},
       {:bandit, "~> 1.0"},
-      {:poison, "~> 6.0"},
+      {:poison, "~> 6.0"}
     ]
   end
 end
