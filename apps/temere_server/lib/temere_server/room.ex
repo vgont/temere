@@ -1,4 +1,5 @@
 defmodule TemereServer.Room do
+  alias TemereServer.RoomRegistry
   use GenServer
 
   ## Client API
@@ -39,7 +40,8 @@ defmodule TemereServer.Room do
         {:reply, {:error, :player_not_found}, state}
 
       length(players) == 0 ->
-        {:stop, :no_players, :ok, state}
+        send(RoomRegistry, {:delete, self()})
+        {:stop, :normal, :ok, state}
 
       true ->
         {:reply, :ok, %{players: players, status: :waiting_for_player}}
