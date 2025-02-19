@@ -14,4 +14,15 @@ defmodule TemereServer.RoomRegistryRouterTest do
     assert conn.status == 200
     assert {:ok, _room} = RoomRegistry.lookup(RoomRegistry, "namae")
   end
+
+  test "GET /room/all" do
+    player = Player.create!("vgont")
+    RoomRegistry.create(RoomRegistry, player, "manae")
+
+    conn = conn(:get, "/room/all")
+    conn = TemereServer.call(conn, @opts)
+    assert conn.status == 200
+    [room_name | _] = Poison.decode!(conn.resp_body)
+    assert room_name == "manae"
+  end
 end
