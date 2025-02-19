@@ -14,6 +14,10 @@ defmodule TemereServer.RoomRegistry do
     GenServer.call(server, {:lookup, room_name})
   end
 
+  def get_all_rooms(server) do
+    GenServer.call(server, :get_all_rooms)
+  end
+
   def init(room_table) do
     :ets.new(room_table, [:set, :protected, :named_table])
     {:ok, room_table}
@@ -37,6 +41,11 @@ defmodule TemereServer.RoomRegistry do
       [{^room_name, room}] -> {:reply, {:ok, room}, room_table}
       [] -> {:reply, {:error, :not_found}, room_table}
     end
+  end
+
+  def handle_call(:get_all_rooms, _from, room_table) do
+    rooms = :ets.tab2list(room_table)
+    {:reply, rooms, room_table}
   end
 
   def handle_info({:delete, room}, room_table) do
