@@ -1,5 +1,6 @@
 defmodule TemereServer.Room do
   alias TemereServer.RoomRegistry
+
   use GenServer
 
   ## Client API
@@ -13,38 +14,29 @@ defmodule TemereServer.Room do
 
   @impl true
   def init(player_1) do
-    {:ok, %{players: [player_1], status: :waiting_for_player}}
+    {:ok, %{players: [player_1], word: nil, hints: []}}
   end
 
   @impl true
-  def handle_call({:join, player}, _from, state) do
-    players = state.players
+  def handle_call({:join, player}, _from, %{players: players} = state) when length(players) < 2 do
+      players = [player | players]
+      {:reply, {:ok, players}, %{state | players: players}}
+  end
 
-    if length(players) < 2 do
-      players =
-        [player | players]
-        |> Enum.reject(&is_nil/1)
+  @impl true
+  def handle_call({:join, _player}, _from, state), do: {:reply, {:error, :full_room}, state}
 
-      {:reply, {:ok, players}, %{players: players, status: :ready}}
+  @impl true
+  def handle_call({:exit, player}, _from, %{players: players} = state) do
+    players = remove_player(players, player)
+
+    if players == [] do
+      send(RoomRegistry, {:delete, self()})
+      {:stop, :normal, :ok, %{state | players: players}}
     else
-      {:reply, {:error, :full_room}, state}
+      {:reply, :ok, %{state | players: players}}
     end
   end
 
-  @impl true
-  def handle_call({:exit, player}, _from, state) do
-    players = Enum.reject(state.players, &(&1 == player))
-
-    cond do
-      Enum.find(players, &(&1 == player)) != nil ->
-        {:reply, {:error, :player_not_found}, state}
-
-      length(players) == 0 ->
-        send(RoomRegistry, {:delete, self()})
-        {:stop, :normal, :ok, state}
-
-      true ->
-        {:reply, :ok, %{players: players, status: :waiting_for_player}}
-    end
-  end
+  defp remove_player(players, player), do: Enum.reject(players, &(&1 == player))
 end
