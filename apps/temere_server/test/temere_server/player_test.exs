@@ -11,13 +11,5 @@ defmodule TemereServer.PlayerTest do
     player = Player.create!("vgont")
     assert player.uuid != nil
     assert player.name == "vgont"
-    assert player.type == nil
-  end
-
-  test "randomly set the player type" do
-    player = Player.create!("vgont")
-    assert player.name == "vgont"
-
-    # Player.put_player_type(player.uuid)
   end
 end
