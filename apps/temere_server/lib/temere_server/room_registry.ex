@@ -14,6 +14,10 @@ defmodule TemereServer.RoomRegistry do
     GenServer.call(server, {:lookup, room_name})
   end
 
+  def join(server, room_name, player) do
+    GenServer.call(server, {:join, room_name, player})
+  end
+
   def get_all_rooms(server) do
     GenServer.call(server, :get_all_rooms)
   end
@@ -24,23 +28,26 @@ defmodule TemereServer.RoomRegistry do
   end
 
   def handle_call({:create, player, room_name}, _from, room_table) do
-    case :ets.lookup(room_table, room_name) do
-      [] ->
+    case get_room(room_table, room_name) do
+      :not_found ->
         {:ok, room} = GenServer.start_link(Room, player)
         :ets.insert(room_table, {room_name, room})
-
         {:reply, :ok, room_table}
 
-      _ ->
+      {:ok, _room} ->
         {:reply, {:error, :already_exists}, room_table}
     end
   end
 
   def handle_call({:lookup, room_name}, _from, room_table) do
-    case :ets.lookup(room_table, room_name) do
-      [{^room_name, room}] -> {:reply, {:ok, room}, room_table}
-      [] -> {:reply, {:error, :not_found}, room_table}
-    end
+    result = get_room(room_table, room_name)
+    {:reply, result, room_table}
+  end
+
+  def handle_call({:join, room_name, player}, _from, room_table) do
+    {:ok, room} = get_room(room_table, room_name)
+    Room.join(room, player)
+    {:reply, :ok, room_table}
   end
 
   def handle_call(:get_all_rooms, _from, room_table) do
@@ -52,5 +59,12 @@ defmodule TemereServer.RoomRegistry do
   def handle_info({:delete, room}, room_table) do
     :ets.match_delete(room_table, {:"$1", room})
     {:noreply, room_table}
+  end
+
+  defp get_room(room_table, room_name) do
+    case :ets.lookup(room_table, room_name) do
+      [{^room_name, room}] -> {:ok, room}
+      [] -> :not_found
+    end
   end
 end
