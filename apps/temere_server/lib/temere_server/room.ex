@@ -11,8 +11,8 @@ defmodule TemereServer.Room do
     GenServer.call(room, :get_helper_and_guesser)
   end
 
-  def set_word(room, word) do
-    GenServer.call(room, {:set_word, word})
+  def set_word(room, word, player) do
+    GenServer.call(room, {:set_word, word, player})
   end
 
   def change_helper(room) do
@@ -37,17 +37,20 @@ defmodule TemereServer.Room do
   end
 
   @impl true
-  def handle_call({:join, player}, _from, %{helper: helper, guesser: guesser} = state) do
+  def handle_call({:join, player}, _from, %{helper: helper, guesser: guesser} = state)
+      when player != helper and player != guesser do
     cond do
       guesser == nil -> {:reply, :ok, %{state | guesser: player}}
       helper == nil -> {:reply, :ok, %{state | helper: player}}
-      true -> {:reply, {:error, :full_room}, state}
+      true -> {:reply, {:error, "room already full"}, state}
     end
   end
 
+  def handle_call({:join, _player}, _from, state), do: {:reply, {:error, "player already joined"}, state}
+
   @impl true
   def handle_call(:get_helper_and_guesser, _from, %{helper: helper, guesser: guesser} = state) do
-   {:reply, {:ok, helper, guesser}, state}
+    {:reply, {:ok, helper, guesser}, state}
   end
 
   @impl true
@@ -57,8 +60,11 @@ defmodule TemereServer.Room do
   end
 
   @impl true
-  def handle_call({:set_word, word}, _from, state) do
-    {:reply, :ok, %{state | word: word}}
+  def handle_call({:set_word, word, player}, _from, %{helper: helper} = state) do
+    case player do
+      ^helper -> {:reply, :ok, %{state | word: word}}
+      _ -> {:reply, {:error, "Only the helper can set the word"}, state}
+    end
   end
 
   @impl true
@@ -68,20 +74,20 @@ defmodule TemereServer.Room do
 
   @impl true
   def handle_call({:add_hint, _hint}, _from, %{hints: hints} = state) when length(hints) == 5 do
-    {:reply, {:error, :max_hints_reached}, state}
+    {:reply, {:error, "max hints reached"}, state}
   end
 
   @impl true
   def handle_call({:add_hint, hint}, _from, %{word: word, hints: hints} = state)
       when hint != word do
     case Enum.member?(hints, hint) do
-      true -> {:reply, {:error, :hint_already_used}, state}
+      true -> {:reply, {:error, "hint already used"}, state}
       false -> {:reply, :ok, %{state | hints: [hint | hints]}}
     end
   end
 
   @impl true
-  def handle_call({:add_hint, _hint}, _from, state), do: {:reply, {:error, :wrong_hint}, state}
+  def handle_call({:add_hint, _hint}, _from, state), do: {:reply, {:error, "invalid hint"}, state}
 
   @impl true
   def handle_call({:exit, player}, _from, %{helper: helper, guesser: guesser} = state) do
