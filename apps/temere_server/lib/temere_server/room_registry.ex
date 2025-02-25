@@ -32,10 +32,10 @@ defmodule TemereServer.RoomRegistry do
       :not_found ->
         {:ok, room} = GenServer.start_link(Room, player)
         :ets.insert(room_table, {room_name, room})
-        {:reply, :ok, room_table}
+        {:reply, {:ok, room}, room_table}
 
       {:ok, _room} ->
-        {:reply, {:error, :already_exists}, room_table}
+        {:reply, {:error, "Room already exists"}, room_table}
     end
   end
 
@@ -46,8 +46,8 @@ defmodule TemereServer.RoomRegistry do
 
   def handle_call({:join, room_name, player}, _from, room_table) do
     {:ok, room} = get_room(room_table, room_name)
-    Room.join(room, player)
-    {:reply, :ok, room_table}
+    response = Room.join(room, player)
+    {:reply, response, room_table}
   end
 
   def handle_call(:get_all_rooms, _from, room_table) do
