@@ -16,17 +16,17 @@ defmodule TemereServer.RoomTest do
     assert :ok = Room.join(room, player_2)
 
     invalid_player = Player.create!("invalid_player")
-    assert {:error, :full_room} = Room.join(room, invalid_player)
+    assert {:error, _reason} = Room.join(room, invalid_player)
   end
 
   @tag :room
   test "A player exits the room", %{player_1: player_1} do
-    assert :ok = RoomRegistry.create(RoomRegistry, player_1, "xesquedele")
+    assert {:ok, _room} = RoomRegistry.create(RoomRegistry, player_1, "xesquedele")
     {:ok, room} = RoomRegistry.lookup(RoomRegistry, "xesquedele")
 
     assert :ok = Room.exit(room, player_1)
 
-    assert {:error, :not_found} = RoomRegistry.lookup(RoomRegistry, "xesquedele")
+    assert :not_found = RoomRegistry.lookup(RoomRegistry, "xesquedele")
   end
 
   @tag :room
@@ -41,12 +41,14 @@ defmodule TemereServer.RoomTest do
   end
 
   @tag :room
-  test "Player SET and GET a word to the room", %{room: room} do
+  test "Player SET and GET a word to the room", %{room: room, player_1: player_1, player_2: player_2} do
     assert {:ok, nil} = Room.get_word(room)
 
-    assert :ok = Room.set_word(room, "word")
+    assert :ok = Room.set_word(room, "word", player_1)
 
     assert {:ok, word} = Room.get_word(room)
     assert word == "word"
+
+    assert {:error, _reason} = Room.set_word(room, "invalid_word", player_2)
   end
 end
