@@ -9,7 +9,8 @@ defmodule TemereServer.Application do
   def start(_type, _args) do
     children = [
       {Bandit, plug: TemereServer},
-      {TemereServer.RoomRegistry, []}
+      {Registry, keys: :unique, name: TemereServer.RoomRegistry},
+      {TemereServer.PlayerRegistry, []}
     ]
 
     opts = [strategy: :one_for_one, name: TemereServer.Supervisor]

@@ -28,7 +28,9 @@ defmodule TemereServer.MixProject do
     [
       {:uuid, "~> 1.1"},
       {:bandit, "~> 1.0"},
+      {:cors_plug, "~> 3.0"},
       {:websock_adapter, "~> 0.5.8"},
+      {:websockex, "~> 0.4.3"},
       {:poison, "~> 6.0"}
     ]
   end

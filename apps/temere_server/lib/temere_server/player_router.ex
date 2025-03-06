@@ -1,15 +1,14 @@
 defmodule TemereServer.PlayerRouter do
   use Plug.Router
   import Plug.Conn
-  alias TemereServer.Player
+  alias TemereServer.PlayerRegistry
 
   plug(:match)
   plug(:dispatch)
 
-  post "/new" do
-    player = conn.body_params
-    player = Player.create!(player["name"])
-    conn = send_resp(conn, 200, Poison.encode!(player))
+  get "/new/:name" do
+    {:ok, player} = PlayerRegistry.register(name)
+    conn = send_resp(conn, 201, Poison.encode!(player))
     conn
   end
 end
